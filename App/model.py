@@ -60,6 +60,7 @@ def crearCatalogo():
     catalog["airports"] = mp.newMap()
     catalog["cities"] = mp.newMap()
     catalog["lat_long"] = mp.newMap()
+    catalog["cities_id"] = mp.newMap()
 
     return catalog
 def addAirport(catalog, airport):
@@ -97,6 +98,59 @@ def addAirport(catalog, airport):
         om.put(orde2, long, list1)
         om.put(ordemap, lat, orde2)
     
+    return catalog
+
+def addRoute(catalog, route):
+
+    departure = route["Departure"]
+    destination = route["Destination"]
+    distance_km = route['distance_km']
+    edge = gr.getEdge(catalog["directed"], departure, destination)
+
+    if edge != None:
+        gr.addEdge(catalog["directed"], departure, destination, float(distance_km))
+
+    return catalog
+
+def addCity(catalog, city):
+    
+    cities = catalog["cities"]
+    city_name = city['city_ascii']
+    exist = mp.contains(cities,city_name)
+
+    if exist:
+        dupla = mp.get(cities,city_name)
+        list1 = me.getValue(dupla)
+
+    else:
+        list1 = lt.newList()
+
+    lt.addLast(list1,city)
+    mp.put(cities,city_name,list1)
+    
+    id = city['id']
+    cities_id = catalog['ciudades_id']
+    mp.put(cities_id,id,city)
+
+    return catalog
+
+def addRouteUndirected(catalog, route):
+
+    departure = route['Departure']
+    destination = route['Destination']
+    distance = route['distance_km']
+    directed= catalog["directed"]
+    edge = gr.getEdge(directed, destination, departure)
+
+    if edge != None:
+
+        if gr.containsVertex(catalog["undirected"], destination) != True:
+            gr.insertVertex(catalog["undirected"], destination)
+
+        if gr.containsVertex(catalog["undirected"], departure) != True:
+            gr.insertVertex(catalog["undirected"], departure)
+        gr.addEdge(catalog["undirected"], destination, departure, distance)
+
     return catalog
 
 

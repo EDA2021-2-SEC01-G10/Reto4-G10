@@ -36,7 +36,9 @@ def iniciarCatalogo():
 def cargarDatos(catalog):
     
     cargarAeropuertos(catalog)
-
+    cargarRutas(catalog)
+    cargarCiudades(catalog)
+    cargarRutasNoDirigido(catalog)
 
     return catalog
 
@@ -49,6 +51,31 @@ def cargarAeropuertos(catalog):
 ### Aeropuetos ###
     for x in input_file:
         model.addAirport(catalog, x)
+
+def cargarRutas(catalog):
+
+    booksfile = cf.data_dir + 'Skylines/routes_full.csv'
+    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
+### Rutas ###
+    for x in input_file:
+        model.addRoute(catalog, x)
+
+def cargarCiudades(catalog):
+    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
+    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
+### Ciudades ###
+    for x in input_file:
+        model.addAirport(catalog, x)
+
+def cargarRutasNoDirigido(catalog):
+
+    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
+    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
+### Rutas ###
+    for x in input_file:
+        model.addAirport(catalog, x)   
+
+
 
 # Funciones de ordenamiento
 
