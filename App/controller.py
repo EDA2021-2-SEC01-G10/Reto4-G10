@@ -28,10 +28,27 @@ import csv
 """
 El controlador se encarga de mediar entre la vista y el modelo.
 """
-
+def iniciarCatalogo():
+    catalog = model.crearCatalogo()
+    return catalog
 # Inicialización del Catálogo de libros
 
+def cargarDatos(catalog):
+    
+    cargarAeropuertos(catalog)
+
+
+    return catalog
+
 # Funciones para la carga de datos
+
+def cargarAeropuertos(catalog):
+
+    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
+    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
+### Aeropuetos ###
+    for x in input_file:
+        model.addAirport(catalog, x)
 
 # Funciones de ordenamiento
 

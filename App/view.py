@@ -24,6 +24,13 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
+from DISClib.ADT import stack as st
+from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.ADT import orderedmap as om
+from DISClib.ADT.graph import gr
+import DISClib.Algorithms.Graphs.prim as pr
 assert cf
 
 
@@ -46,6 +53,9 @@ def printMenu():
     print('8- Req 6 (BONO): Comparar con servicio WEB externo')
     print('0- Salir')
 
+def cargarDatos(catalog):
+    return controller.cargarDatos(catalog)
+
 catalog = None
 
 """
@@ -56,6 +66,7 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
+        catalog = controller.iniciarCatalogo()
 
     elif int(inputs[0]) == 2:
         print("Creando catalogo...")
