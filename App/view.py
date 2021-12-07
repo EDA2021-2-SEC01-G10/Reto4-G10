@@ -20,6 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from math import tan
 import config as cf
 import sys
 import controller
@@ -67,12 +68,48 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = controller.iniciarCatalogo()
-        print(catalog)
 
     elif int(inputs[0]) == 2:
         print("Creando catalogo...")
+        cargarDatos(catalog)
+        keys = mp.keySet(catalog["airports"])
+        keys_c = mp.keySet(catalog["cities"])
 
+        first_element = lt.firstElement(keys)
+        last_element = lt.lastElement(keys_c)
+        first_element_c = lt.firstElement(keys)
+        last_element_c = lt.lastElement(keys_c)
 
+        first = mp.get(catalog["airports"], first_element)
+        last = mp.get(catalog["airports"], last_element)
+        first_c = mp.get(catalog["cities"], first_element_c)
+        last_c = mp.get(catalog["cities"], last_element_c)
+
+        value = me.getValue(first)
+        value_last = me.getValue(first)
+        value_c = me.getValue(first_c)
+        value_clast = me.getValue(first_c)
+
+        tad = "Total Aeropuertos: " + str(gr.numVertices(catalog["directed"])) 
+        trd = "Total de rutas: " + str(gr.numEdges(catalog["directed"]))
+        tand = "Total Aeropuertos: " + str(gr.numVertices(catalog["undirected"])) 
+        trnd = "Total de rutas: " + str(gr.numEdges(catalog["undirected"]))
+        
+
+        print("Grafo Dirigido: " + tad + trd +   " Grago No Dirigido: " + tand + trnd )
+        print("  Información del primer Aeropuerto cargado: ")
+        print("Nombre: " + value["Name"] + " Ciudad: " + value["City"] + " País: " + value["Country"] 
+                            + " Latitud: " + value["Latitude"] + " Longitud: " + value["Longitude"])
+        print("Información último Aeropuerto cargado: ")
+        print("Nombre: " + value_last["Name"] + " Ciudad: " + value_last["City"] + " País: " + value_last["Country"] 
+                            + " Latitud: " + value_last["Latitude"] + " Longitud: " + value_last["Longitude"])
+        
+        print("  Información de la primera ciudad cargada: ")
+        print("Nombre: " + value_c["city_ascii"] + " Latitud: " + value_c["lat"] + " Longitud: " + value_c["lng"] 
+                                                                    + " Población: " + value_c["population"])
+        print("  Información de la última ciudad cargada: ")
+        print("Nombre: " + value_clast["city_ascii"] + " Latitud: " + value_clast["lat"] + " Longitud: " + value_clast["lng"] 
+                                                                    + " Población: " + value_clast["population"])
         pass
 
     elif int(inputs[0]) == 3:
