@@ -182,13 +182,13 @@ def efecto_ac(cat, aeropuerto):
     number = lt.removeFirst(result)
     list1 = lt.removeFirst(result)
 
-    print("Número de Aeropuertos afectados: " + str(number))
-    print("Primeros 3 Aeropiertos afectados: ")
+    print("Número de Aeropuertos afectados: " + str(number-1))
+    print("Primeros 3 y últimos 3 Aeropuertos afectados: ")
    
-    for y in range(0, 3):
-        if lt.getElement(list1,y) != lt.getElement(list1,y-1):
-            print('IATA: ' + lt.getElement(list1,y)['IATA'] + ', Nombre: ' + lt.getElement(list1,y)['Name']
-            + ', Ciudad: ' + lt.getElement(list1,y)['City'] + ', País: ' + lt.getElement(list1,y)['Country']) 
+    for x in lt.iterator(list1):
+        if x is not None:
+            print('IATA: ' + x['IATA'] + ', Nombre: ' + x['Name']
+            + ', Ciudad: ' + x['City'] + ', País: ' + x['Country']) 
 
 def printreq4(cat):
 
