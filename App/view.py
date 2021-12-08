@@ -182,6 +182,54 @@ def efecto_ac(cat, aeropuerto):
             print('IATA: ' + lt.getElement(list1,y)['IATA'] + ', Nombre: ' + lt.getElement(list1,y)['Name']
             + ', Ciudad: ' + lt.getElement(list1,y)['City'] + ', País: ' + lt.getElement(list1,y)['Country']) 
 
+def printreq4(cat):
+
+    origin = input("Ingrese la ciudad de origen: ")
+    miles = float(input("Ingrese su cantidad de Millas: "))
+    km = miles * 1.60
+    final, costo, cantidad, iata = controller.millas_viajero(cat, origin)
+    peso = 0 
+
+    print("Aeropuerto de Origen: " + mp.get(cat["airports"], iata)["value"]["Name"] 
+            + " de la ciudad de " + mp.get(cat["airports"], iata)["value"]["City"] + ", " 
+                + mp.get(cat["airports"], iata)["value"]["Country"])
+    
+    print("Numero de Aeropuertos Posibles: " + str(cantidad))
+   
+    print("Maxima distancia posible entre aeropuertos en km: " + str(round(costo, 2)))
+    
+    print("Millas del pasajero en Km: " + str(round(km, 2)))
+
+    print("Detalles Recorrido más Largo")
+  
+    while not st.isEmpty(final):
+        A = st.pop(final)
+        B = st.top(final)
+        edge = gr.getEdge(cat["undirected"], A, B)
+
+        print(edge["vertexA"] + "--->" + edge["vertexB"] 
+                    + " costo: " + str(edge["weight"]))
+        peso += edge["weight"]
+
+        if st.size(final) == 1:
+            break
+
+    print("Distancia del Recorrido más Largo: " + str(round(peso, 2)))
+
+    if km < peso:
+        total = peso - km
+        millas_finanles = round((total / 1.60), 2)
+        print("Hacen falta: " + str(millas_finanles) + " millas para completar el viaje")
+
+    else:
+
+        total = km - peso
+        millas_finanles = round((total / 1.60), 2)
+        print("Al pasajero le quedan: " + str(millas_finanles) + " millas")
+
+    return None 
+
+
 cat = None
 
 
@@ -230,9 +278,7 @@ while True:
         
     elif int(inputs[0]) == 6:
         print("Req 4")
-        
-
-
+        printreq4(cat)
         pass
 
     elif int(inputs[0]) == 7:
@@ -244,6 +290,7 @@ while True:
 
     elif int(inputs[0]) == 8:
         print("Req 6 (BONO)")
+        print(cat["cities"][10])
         pass
 
 

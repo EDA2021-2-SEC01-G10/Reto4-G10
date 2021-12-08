@@ -93,3 +93,6 @@ def buscarAeropuertoOrigen(cat,ciudadOrigen):
 
 def efecto_ac(cat, aeropuerto):
     return model.efecto_ac(cat, aeropuerto)
+
+def millas_viajero(cat, origen):
+    return model.millas_viajero(cat, origen)

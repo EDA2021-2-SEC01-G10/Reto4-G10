@@ -31,10 +31,15 @@ from DISClib.ADT import map as mp
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort as ms
 from DISClib.ADT.graph import gr, indegree, vertices
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as dij
+from DISClib.Algorithms.Graphs import prim
+from DISClib.ADT import queue as qu
+from DISClib.ADT import stack as st
 from DISClib.Algorithms.Graphs import dfs
+from math import radians, cos, sin, asin, sqrt
 assert cf
 
 """
@@ -164,7 +169,7 @@ def buscarAeropuertoOrigen(cat,ciudadOrigen):
     pais=ciudadOrigen["country"].lower()
     lat=ciudadOrigen["lat"]
     lon=ciudadOrigen["lng"]
-    aeropuertos=cat["airportsLt"] 
+    aeropuertos = cat["airportsLt"] 
     for aeropuerto in lt.iterator(aeropuertos):
         if aeropuerto["City"].lower() == nombre and aeropuerto["Country"].lower() == pais: 
            latitudAr= aeropuerto["Latitude"] 
@@ -187,11 +192,11 @@ def cmpConexiones (vertice1,vertice2):
     return vertice1[0] > vertice2[0] 
 
 
-def efecto_ac(analyzer, aeropuerto):
+def efecto_ac(cat, aeropuerto):
 
-    graph = analyzer["directed"]
+    graph = cat["directed"]
     iatas = gr.adjacents(graph, aeropuerto)
-    airports = analyzer["airports"]
+    airports = cat["airports"]
     result = lt.newList()
 
     lt.addLast(result, lt.size(iatas))
@@ -205,3 +210,117 @@ def efecto_ac(analyzer, aeropuerto):
     lt.addLast(result, list1)
     return result
 
+def millas_viajero(cat, origen):
+
+    undirected = cat["undirected"]
+    cities = cat["cities"]
+    print(cities)
+    cities_origin = mp.get(cities, origen)["value"]
+
+    if lt.size(cities_origin) > 1:
+        ID1 = mismas_ciudades(cities_origin)
+        city1 = mp.get(cat["citiesLt"], ID1)["value"]
+
+    else:
+        ID1 = lt.firstElement(cities_origin)["id"]
+        city1 = mp.get(cat["airportsLt"], ID1)["value"]
+    
+    airport1 = aeropuertos_cercanos(cat, city1)["IATA"]
+
+    search = prim.PrimMST(undirected)
+    prim.edgesMST(undirected, search)
+    path = search['mst']
+    nodos = lt.newList()
+    large = 0
+    final = None
+    peso = prim.weightMST(undirected, search)
+
+    while not qu.isEmpty(path):
+        edge = qu.dequeue(path)
+        lt.addLast(nodos, edge["vertexB"])
+    
+    cantidad = lt.size(nodos)
+
+    h = dfs.DepthFirstSearch(undirected, airport1)
+    for x in lt.iterator(nodos):
+
+        if dfs.hasPathTo(h, x):
+            p = dfs.pathTo(h, x)
+
+            if st.size(p) > large:
+                large = st.size(p)
+                final = p
+    return final, peso, cantidad, airport1
+
+
+def mismas_ciudades(list1):
+
+    print("Origenes probables: ")
+
+    for x in lt.iterator(list1):
+        print("ID: " + x['id'] + " Nombre: " + x["city_ascii"] + " Latitud: " + x["lat"] + " Longitud: " + x["lng"] 
+                                                                    + " Pais: " + x["country"] + " Subregion: " + x['admin_name'])                            
+    id1 = input('Escoja la ciudad de origen deseada (ingrese el ID de la ciudad): ')
+    return id1
+
+
+def aeropuertos_cercanos(analyzer, ciudad):
+
+    airports = lt.newList()
+    airport1 = om.values(analyzer['latlng'],(float(ciudad["lat"]) - 1), (float(ciudad["lat"]) + 1))
+
+    for x in lt.iterator(airport1):
+
+        lists = om.values(x, (float(ciudad["lng"]) - 1), (float(ciudad["lng"]) + 1))
+
+        for y in lt.iterator(lists):
+            size = lt.size(y)
+            z = 0
+
+            while z < size:
+                i = lt.removeLast(y)
+                lt.addLast(airports,i)
+                z += 1
+                
+    distance1 = lt.newList()
+
+    for x in lt.iterator(airports):
+        latitud = float(x['Latitude'])
+        longitud = float(x['Longitude'])
+        d1 = distancia_en_c(float(ciudad["lng"]),(float(ciudad["lat"])),longitud,latitud)
+        lt.addLast(distance1,d1)
+
+    ms.sort(distance1, ordena)
+
+    dist1 = lt.firstElement(distance1)
+
+    for a1 in lt.iterator(airports):
+
+        lat1 = float(a1['Latitude'])
+        lon1 = float(a1['Longitude'])
+        d1 = distancia_en_c(float(ciudad["lng"]),(float(ciudad["lat"])),lon1,lat1)
+
+        if d1 == dist1:
+            air1 = a1
+            break
+
+    return air1
+
+
+def distancia_en_c(lon1, lat1, lon2, lat2):
+
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    lon_t = lon2 - lon1 
+    lat_t = lat2 - lat1 
+
+    a = sin(lat_t/2)**2 + cos(lat1) * cos(lat2) * sin(lon_t/2)**2
+    c = 2 * asin(sqrt(a)) 
+    dist = c * 6371
+
+    return dist
+
+def ordena(x, y):
+    if (x > y):
+        return 0
+    return -1
