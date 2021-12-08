@@ -90,3 +90,6 @@ def listarDestino(cat,destino):
 def buscarAeropuertoOrigen(cat,ciudadOrigen): 
     aeropuerto=model.buscarAeropuertoOrigen(cat,ciudadOrigen)
     return aeropuerto  
+
+def efecto_ac(cat, aeropuerto):
+    return model.efecto_ac(cat, aeropuerto)

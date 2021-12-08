@@ -168,7 +168,23 @@ def printMenuDestino(listDestino):
         print("")
 
 
+
+def efecto_ac(cat, aeropuerto):
+    result = controller.efecto_ac(cat, aeropuerto)
+    number = lt.removeFirst(result)
+    list1 = lt.removeFirst(result)
+
+    print("Número de Aeropuertos afectados: " + str(number))
+    print("Primeros 3 Aeropiertos afectados: ")
+   
+    for y in range(0, 3):
+        if lt.getElement(list1,y) != lt.getElement(list1,y-1):
+            print('IATA: ' + lt.getElement(list1,y)['IATA'] + ', Nombre: ' + lt.getElement(list1,y)['Name']
+            + ', Ciudad: ' + lt.getElement(list1,y)['City'] + ', País: ' + lt.getElement(list1,y)['Country']) 
+
 cat = None
+
+
 """
 Menu principal
 """
@@ -214,10 +230,16 @@ while True:
         
     elif int(inputs[0]) == 6:
         print("Req 4")
+        
+
+
         pass
 
     elif int(inputs[0]) == 7:
         print("Req 5")
+        aeropuerto = input("Código IATA del aeropuerto fuera de funcionamiento: ")
+        efecto_ac(cat, aeropuerto)
+
         pass
 
     elif int(inputs[0]) == 8:

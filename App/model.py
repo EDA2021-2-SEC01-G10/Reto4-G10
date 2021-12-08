@@ -182,7 +182,26 @@ def buscarAeropuertoOrigen(cat,ciudadOrigen):
     return aeropuertoAscii          
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+
 def cmpConexiones (vertice1,vertice2):
     return vertice1[0] > vertice2[0] 
 
+
+def efecto_ac(analyzer, aeropuerto):
+
+    graph = analyzer["directed"]
+    iatas = gr.adjacents(graph, aeropuerto)
+    airports = analyzer["airports"]
+    result = lt.newList()
+
+    lt.addLast(result, lt.size(iatas))
+    list1 = lt.newList()
+
+    for x in lt.iterator(iatas):
+        dupla = mp.get(airports, x)
+        airport = me.getValue(dupla)
+        lt.addLast(list1, airport)
+
+    lt.addLast(result, list1)
+    return result
 
