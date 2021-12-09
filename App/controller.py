@@ -90,3 +90,11 @@ def listarDestino(cat,destino):
 def buscarAeropuertoOrigen(cat,ciudadOrigen): 
     aeropuerto=model.buscarAeropuertoOrigen(cat,ciudadOrigen)
     return aeropuerto  
+    
+def buscarAeropuertoDestino(cat,ciudadDestino): 
+    aeropuerto=model.buscarAeropuertoOrigen(cat,ciudadDestino)
+    return aeropuerto     
+
+def distanciaVuelo(cat,origen,destino):
+    dis=model.distanciaVuelo(cat,origen,destino)
+    return dis    

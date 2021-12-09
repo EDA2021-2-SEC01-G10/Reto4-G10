@@ -166,7 +166,15 @@ def printMenuDestino(listDestino):
         print("")
         print(str(i+1)+")Ciudad : "+ciudades[i]['city_ascii']+"|País: "+ciudades[i]['country']+"|Latitud: "+ciudades[i]['lat']+"|Longitud: "+ciudades[i]['lng'] )
         print("")
-
+def printsReq3(aeropuertoOrigen,aeropuertoDestino,distanciaVuelo):
+    print("")
+    print("El aeropuerto de salida es: "+aeropuertoOrigen[0])
+    print("")
+    print("El aeropuerto de llegada es: "+aeropuertoDestino[0])
+    print("")
+    print("La distancia del vuelo es: "+str(distanciaVuelo)+" Kilometros")
+    print("")
+    print("La distancia total de la ruta es: "+str(distanciaVuelo+aeropuertoOrigen[1]+aeropuertoDestino[1])+" Kilometros")
 
 cat = None
 """
@@ -210,8 +218,12 @@ while True:
          ciudadDestinoInput=int(input("Ingrese el digito de la ciudad de destino correspondiente :"))
          ciudadDestino=list(lt.iterator(listDestino))[ciudadDestinoInput-1]
          aeropuertoOrigen=controller.buscarAeropuertoOrigen(cat,ciudadOrigen)
-         print(aeropuertoOrigen)
-        
+         aeropuertoDestino=controller.buscarAeropuertoDestino(cat,ciudadDestino)
+         origen=aeropuertoOrigen[0]
+         destino=aeropuertoDestino[0]
+         distanciaVuelo=controller.distanciaVuelo(cat,origen,destino)
+         printsReq3(aeropuertoOrigen,aeropuertoDestino,distanciaVuelo)
+
     elif int(inputs[0]) == 6:
         print("Req 4")
         pass

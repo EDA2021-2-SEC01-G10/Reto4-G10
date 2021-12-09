@@ -25,6 +25,7 @@
  """
 
 
+from math import asin, cos, radians, sin, sqrt
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -82,7 +83,7 @@ def addRout(cat,route):
 def addRouteDirected(cat, route):
     departure = route["Departure"]
     destination = route["Destination"]
-    distance_km = route['distance_km']
+    distance_km = float(route['distance_km'])
     gr.addEdge(cat["directed"], departure, destination,distance_km)
     
 
@@ -90,7 +91,7 @@ def addRouteDirected(cat, route):
 def addRouteUndirected(cat,route):
     departureUn = route["Departure"]
     destinationUn = route["Destination"]
-    distance_kmUn = route['distance_km']
+    distance_kmUn = float(route['distance_km'])
     tuplaIn=(departureUn,destinationUn)
     tuplaInvert=(destinationUn,departureUn) 
     rutas=cat["rutas"]
@@ -159,28 +160,91 @@ def listarDestino(cat,destino):
     return listDestino   
 
 def buscarAeropuertoOrigen(cat,ciudadOrigen):
-    aeropuertoAscii=""
+    aeropuertoReturn=""
+    distancias=mp.newMap()
     nombre=ciudadOrigen["city_ascii"].lower()
     pais=ciudadOrigen["country"].lower()
-    lat=ciudadOrigen["lat"]
-    lon=ciudadOrigen["lng"]
+    lat=float(ciudadOrigen["lat"])
+    lon=float(ciudadOrigen["lng"])
     aeropuertos=cat["airportsLt"] 
     for aeropuerto in lt.iterator(aeropuertos):
         if aeropuerto["City"].lower() == nombre and aeropuerto["Country"].lower() == pais: 
-           latitudAr= aeropuerto["Latitude"] 
-           longitudAr=aeropuerto["Longitude"] 
-           encontrado = False 
-           while encontrado == False :
-                 var=100
-                 if lon <= longitudAr <= lon+var and lat <= latitudAr <= lat+var :
-                    aeropuertoAscii=""
-                    encontrado = True
-                 else:   
-                      encontrado = False
-                      var+=100
-                      
-    return aeropuertoAscii          
+           iata=aeropuerto["IATA"] 
+           latitudAr= float(aeropuerto["Latitude"] )
+           longitudAr=float(aeropuerto["Longitude"]) 
+           distancia=heversine(lat,lon,latitudAr,longitudAr)
+           if not mp.contains(distancias,iata):
+               mp.put(distancias,iata,distancia)
+        elif aeropuerto["Country"].lower() == pais: 
+             iata=aeropuerto["IATA"] 
+             latitudAr= float(aeropuerto["Latitude"] )
+             longitudAr=float(aeropuerto["Longitude"]) 
+             distancia=heversine(lat,lon,latitudAr,longitudAr)
+             if not mp.contains(distancias,iata):
+                mp.put(distancias,iata,distancia)  
+    disNums=mp.valueSet(distancias)
+    lista=[]
+    for num in lt.iterator(disNums):
+        lista.append(num)
+    distanciaMinima=min(lista)    
+    diskeys=mp.keySet(distancias)
+    for key in lt.iterator(diskeys):
+        valor=mp.get(distancias,key)["value"]
+        if valor == distanciaMinima:
+           aeropuertoReturn=key                                       
+    return (aeropuertoReturn,distanciaMinima)    
 
+def buscarAeropuertoDestino(cat,ciudadDestino):
+    aeropuertoReturn=""
+    distancias=mp.newMap()
+    nombre=ciudadDestino["city_ascii"].lower()
+    pais=ciudadDestino["country"].lower()
+    lat=float(ciudadDestino["lat"])
+    lon=float(ciudadDestino["lng"])
+    aeropuertos=cat["airportsLt"] 
+    for aeropuerto in lt.iterator(aeropuertos):
+        if aeropuerto["City"].lower() == nombre and aeropuerto["Country"].lower() == pais: 
+           iata=aeropuerto["IATA"] 
+           latitudAr= float(aeropuerto["Latitude"] )
+           longitudAr=float(aeropuerto["Longitude"]) 
+           distancia=heversine(lat,lon,latitudAr,longitudAr)
+           if not mp.contains(distancias,iata):
+               mp.put(distancias,iata,distancia)
+        elif aeropuerto["Country"].lower() == pais: 
+             iata=aeropuerto["IATA"] 
+             latitudAr= float(aeropuerto["Latitude"] )
+             longitudAr=float(aeropuerto["Longitude"]) 
+             distancia=heversine(lat,lon,latitudAr,longitudAr)
+             if not mp.contains(distancias,iata):
+                mp.put(distancias,iata,distancia)  
+                
+    disNums=mp.valueSet(distancias)
+    lista=[]
+    for num in lt.iterator(disNums):
+        lista.append(num)
+    distanciaMinima=min(lista)    
+    diskeys=mp.keySet(distancias)
+    for key in lt.iterator(diskeys):
+        valor=mp.get(distancias,key)["value"]
+        if valor == distanciaMinima:
+           aeropuertoReturn=key                                       
+    return (aeropuertoReturn,distanciaMinima)    
+
+def heversine(lat1,lon1,lat2,lon2):
+    dlon = radians(lon2 - lon1) 
+    dlat = radians(lat2 - lat1) 
+    lat1=radians(lat1)
+    lat2=radians(lat2)
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+    return c * 6371
+
+def distanciaVuelo(cat,origen,destino):
+    grafo=cat["directed"]
+    s=dij.Dijkstra(grafo,origen)
+    dis=dij.distTo(s,destino)
+    return dis    
+    
 # Funciones utilizadas para comparar elementos dentro de una lista
 def cmpConexiones (vertice1,vertice2):
     return vertice1[0] > vertice2[0] 
