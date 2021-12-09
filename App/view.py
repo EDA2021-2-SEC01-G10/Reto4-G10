@@ -289,7 +289,7 @@ while True:
         pass
 
     elif int(inputs[0]) == 7:
-        aeropuerto = input("Código IATA del aeropuerto fuera de funcionamiento: ")
+        aeropuerto = input("Código IATA del aeropuerto fuera de funcionamiento:  ")
         efecto_ac(cat, aeropuerto)
 
     elif int(inputs[0]) == 8:
