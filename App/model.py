@@ -31,7 +31,8 @@ from DISClib.ADT import map as mp
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
-from DISClib.ADT.graph import gr, indegree
+from DISClib.ADT.graph import gr, indegree, vertices
+from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as dij
 from DISClib.Algorithms.Graphs import dfs
 assert cf
@@ -43,123 +44,145 @@ los mismos.
 
 # Construccion de modelos
 
-def crearCatalogo():
+def newAnalyzer():
 
-    catalog = {"directed":None, "airports": None,}
+    analyzer = {"airports":None ,"airportsLt":None,"airportsCity":None ,"rutas":None, "cities":None,"citiesLt":None,"directed":None, "undirected": None}   
+    analyzer["airports"]=mp.newMap(comparefunction=None) 
+    analyzer["cities"]=mp.newMap(comparefunction=None)
+    analyzer["airportsCity"]=mp.newMap(comparefunction=None)
+    analyzer["airportsLt"]=lt.newList(datastructure="ARRAY_LIST",cmpfunction=None)
+    analyzer["citiesLt"]=lt.newList(datastructure="ARRAY_LIST",cmpfunction=None)
+    analyzer["rutas"]=lt.newList(datastructure="ARRAY_LIST",cmpfunction=None)
 
-    catalog["directed"] = gr.newGraph(datastructure="ADJ_LIST",
-    directed = True,
-    size=14000, 
-    comparefunction=None)
+    analyzer["directed"] = gr.newGraph(datastructure="ADJ_LIST",
+                            directed = True,
+                            size=10,
+                            comparefunction=None)
 
-    catalog["undirected"] = gr.newGraph(datastructure="ADJ_LIST",
-    directed = False,
-    size=14000, 
-    comparefunction=None)
+    analyzer["undirected"] = gr.newGraph(datastructure="ADJ_LIST",
+                                directed = False, 
+                                size=10,
+                                comparefunction=None)
 
-    catalog["airports"] = mp.newMap()
-    catalog["cities"] = mp.newMap()
-    catalog["lat_long"] = mp.newMap()
-    catalog["cities_id"] = mp.newMap()
-
-    return catalog
-def addAirport(catalog, airport):
-
-    iata = airport["IATA"]
-    mp.put(catalog["airports"], iata, airport)
-
-    if not gr.containsVertex(catalog["directed"], iata):
-        gr.insertVertex(catalog["directed"], iata)
-
-    ordemap = catalog["lat_long"]
-    long = float(airport["Latitude"])
-    lat = float(airport["Latitude"])
-    exist_latitude = om.contains(ordemap, lat)
-
-    if exist_latitude:
-        dupla = om.get(ordemap, lat)
-        orde2 = me.getValue(dupla)
-        exist_latitude = om.contains(orde2, long)
-        
-        if exist_latitude:
-            dupla2 = om.get(orde2, long)
-            list1 = me.getValue(dupla2)
-
-        else:
-            list1 = lt.newList()
-
-        lt.addLast(list1, airport)
-        om.put(orde2, long, list1)
-
-    else:
-        orde2 = lt.newList()
-        list1 = lt.newList()
-        lt.addLast(list1, airport)
-        om.put(orde2, long, list1)
-        om.put(ordemap, lat, orde2)
-    
-    return catalog
-
-def addRoute(catalog, route):
-
-    departure = route["Departure"]
-    destination = route["Destination"]
-    distance_km = route['distance_km']
-    edge = gr.getEdge(catalog["directed"], departure, destination)
-
-    if edge != None:
-        gr.addEdge(catalog["directed"], departure, destination, float(distance_km))
-
-    return catalog
-
-def addCity(catalog, city):
-    
-    cities = catalog["cities"]
-    city_name = city['city_ascii']
-    exist = mp.contains(cities,city_name)
-
-    if exist:
-        dupla = mp.get(cities,city_name)
-        list1 = me.getValue(dupla)
-
-    else:
-        list1 = lt.newList()
-
-    lt.addLast(list1,city)
-    mp.put(cities,city_name,list1)
-    
-    id = city['id']
-    cities_id = catalog['ciudades_id']
-    mp.put(cities_id,id,city)
-
-    return catalog
-
-def addRouteUndirected(catalog, route):
-
-    departure = route['Departure']
-    destination = route['Destination']
-    distance = route['distance_km']
-    directed= catalog["directed"]
-    edge = gr.getEdge(directed, destination, departure)
-
-    if edge != None:
-
-        if gr.containsVertex(catalog["undirected"], destination) != True:
-            gr.insertVertex(catalog["undirected"], destination)
-
-        if gr.containsVertex(catalog["undirected"], departure) != True:
-            gr.insertVertex(catalog["undirected"], departure)
-        gr.addEdge(catalog["undirected"], destination, departure, distance)
-
-    return catalog
-
+    return analyzer
 
 # Funciones para agregar informacion al catalogo
 
-# Funciones para creacion de datos
+def addAirport(cat, airport):
+    iata = airport["IATA"] 
+    mp.put(cat["airports"], iata, airport)
+    lt.addLast(cat["airportsLt"],airport)
+    if not gr.containsVertex(cat["directed"], iata):
+       gr.insertVertex(cat["directed"], iata)
+       gr.insertVertex(cat["undirected"], iata) 
+
+def addRout(cat,route):
+    lt.addLast(cat["rutas"],route)
+
+def addRouteDirected(cat, route):
+    departure = route["Departure"]
+    destination = route["Destination"]
+    distance_km = route['distance_km']
+    gr.addEdge(cat["directed"], departure, destination,distance_km)
+    
+
+   
+def addRouteUndirected(cat,route):
+    departureUn = route["Departure"]
+    destinationUn = route["Destination"]
+    distance_kmUn = route['distance_km']
+    tuplaIn=(departureUn,destinationUn)
+    tuplaInvert=(destinationUn,departureUn) 
+    rutas=cat["rutas"]
+    for rut in lt.iterator(rutas):
+        departureRuta = rut["Departure"]
+        destinationRuta = rut["Destination"]
+        tupla=(departureRuta,destinationRuta)
+        if tupla== tuplaInvert:
+           if gr.getEdge(cat["undirected"], departureUn, destinationUn) == None:  
+                gr.addEdge(cat["undirected"], departureUn, destinationUn,distance_kmUn)  
+                break
+             
+
+def addCity(cat, city):
+    id=city["id"]
+    mp.put(cat["cities"],id,city)
+    lt.addLast(cat["citiesLt"],city)
 
 # Funciones de consulta
+def masConectados(cat): 
+    maxConexiones=lt.newList(datastructure="ARRAY_LIST",cmpfunction=cmpConexiones)
+    graph=cat["directed"]
+    vertices=gr.vertices(graph)
+    for vertice in lt.iterator(vertices):
+        entran=gr.outdegree(graph,vertice)
+        salen=gr.indegree(graph,vertice)
+        conexiones=entran+salen
+        info=[conexiones,vertice]
+        if conexiones >0: 
+           lt.addLast(maxConexiones,info) 
+    sa.sort(maxConexiones,cmpConexiones)      
+    return maxConexiones     
+
+def top(listMasConectados,cat): 
+    top=lt.newList(datastructure="ARRAY_LIST")
+    mapAeropuertos=cat["airports"]
+    for vertice in lt.iterator(listMasConectados):
+        iata=vertice[1]
+        valor=mp.get(mapAeropuertos,iata)["value"]
+        lt.addLast(top,valor)
+    return top 
+
+def calcularClusteres(cat,iata1,iata2):
+    graph=cat["directed"]
+    sccRet=scc.KosarajuSCC(graph)
+    numeroClusteres=scc.connectedComponents(sccRet)
+    compartenCluster=scc.stronglyConnected(sccRet,iata1,iata2)
+    return (numeroClusteres,compartenCluster) 
+
+def listarOrigen(cat, origen): 
+    listOrigen=lt.newList(datastructure="ARRAY_LIST")
+    ciudades=cat["citiesLt"]
+    for ciudad in lt.iterator(ciudades):
+        nombre=ciudad["city_ascii"]
+        if nombre.lower() == origen:
+           lt.addLast(listOrigen,ciudad)     
+    return listOrigen
+
+def listarDestino(cat,destino):
+    listDestino=lt.newList(datastructure="ARRAY_LIST")
+    ciudades=cat["citiesLt"]
+    for ciudad in lt.iterator(ciudades):
+        nombre=ciudad["city_ascii"]
+        if nombre.lower() == destino:
+           lt.addLast(listDestino,ciudad)     
+    return listDestino   
+
+def buscarAeropuertoOrigen(cat,ciudadOrigen):
+    aeropuertoAscii=""
+    nombre=ciudadOrigen["city_ascii"].lower()
+    pais=ciudadOrigen["country"].lower()
+    lat=ciudadOrigen["lat"]
+    lon=ciudadOrigen["lng"]
+    aeropuertos=cat["airportsLt"] 
+    for aeropuerto in lt.iterator(aeropuertos):
+        if aeropuerto["City"].lower() == nombre and aeropuerto["Country"].lower() == pais: 
+           latitudAr= aeropuerto["Latitude"] 
+           longitudAr=aeropuerto["Longitude"] 
+           encontrado = False 
+           while encontrado == False :
+                 var=100
+                 if lon <= longitudAr <= lon+var and lat <= latitudAr <= lat+var :
+                    aeropuertoAscii=""
+                    encontrado = True
+                 else:   
+                      encontrado = False
+                      var+=100
+                      
+    return aeropuertoAscii          
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+def cmpConexiones (vertice1,vertice2):
+    return vertice1[0] > vertice2[0] 
 
-# Funciones de ordenamiento
+

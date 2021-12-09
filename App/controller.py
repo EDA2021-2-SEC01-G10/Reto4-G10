@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-
+from DISClib.ADT import list as lt
 import config as cf
 import model
 import csv
@@ -28,55 +28,65 @@ import csv
 """
 El controlador se encarga de mediar entre la vista y el modelo.
 """
-def iniciarCatalogo():
-    catalog = model.crearCatalogo()
-    return catalog
-# Inicialización del Catálogo de libros
+# Inicialización 
 
-def cargarDatos(catalog):
-    
-    cargarAeropuertos(catalog)
-    cargarRutas(catalog)
-    cargarCiudades(catalog)
-    cargarRutasNoDirigido(catalog)
+def inicializar():
+    cat = model.newAnalyzer()
+    return cat
 
-    return catalog
 
 # Funciones para la carga de datos
+def cargarDatos(cat):    
+    cargarAeropuertos(cat)
+    cargarRutas(cat)
+    cargarRutasUndirected(cat)
+    cargarCiudades(cat)
+    
+def cargarAeropuertos(cat):
+    airportsfile = cf.data_dir + 'Skylines/airports-utf8-small.csv'
+    input_file = csv.DictReader(open(airportsfile, encoding='utf-8'))
+    for aeropuerto in input_file:
+        model.addAirport(cat, aeropuerto)
 
-def cargarAeropuertos(catalog):
+def cargarRutas(cat):
+    rutesfile = cf.data_dir + 'Skylines/routes-utf8-small.csv'
+    input_file = csv.DictReader(open(rutesfile, encoding='utf-8'))
+    for ruta in input_file:
+        model.addRout(cat,ruta)
+        model.addRouteDirected(cat,ruta) 
 
-    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
-    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
-### Aeropuetos ###
-    for x in input_file:
-        model.addAirport(catalog, x)
+def cargarRutasUndirected(cat): 
+        rutas=cat["rutas"]
+        for ruta in lt.iterator(rutas):      
+            model.addRouteUndirected(cat,ruta) 
 
-def cargarRutas(catalog):
-
-    booksfile = cf.data_dir + 'Skylines/routes_full.csv'
-    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
-### Rutas ###
-    for x in input_file:
-        model.addRoute(catalog, x)
-
-def cargarCiudades(catalog):
-    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
-    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
-### Ciudades ###
-    for x in input_file:
-        model.addAirport(catalog, x)
-
-def cargarRutasNoDirigido(catalog):
-
-    skylinesfile = cf.data_dir + 'Skylines/airports_full.csv'
-    input_file = csv.DictReader(open(skylinesfile, encoding='utf-8'))
-### Rutas ###
-    for x in input_file:
-        model.addAirport(catalog, x)   
-
-
+def cargarCiudades(cat):
+    citiesfile = cf.data_dir + 'Skylines/worldcities-utf8.csv'
+    input_file = csv.DictReader(open(citiesfile, encoding='utf-8')) 
+    for city in input_file: 
+        model.addCity(cat,city) 
+    
 
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+def masConectados(cat): 
+    listMasConectados=model.masConectados(cat)
+    top=model.top(listMasConectados,cat)
+    return (top,listMasConectados)
+
+def calcularClusteres(cat,iata1,iata2):
+    infoClusteres=model.calcularClusteres(cat,iata1,iata2) 
+    return infoClusteres     
+
+def listarOrigen(cat, origen):
+    listOrigen=model.listarOrigen(cat, origen)
+    return listOrigen
+
+def listarDestino(cat,destino):
+    listDestino=model.listarDestino(cat,destino)    
+    return listDestino
+
+def buscarAeropuertoOrigen(cat,ciudadOrigen): 
+    aeropuerto=model.buscarAeropuertoOrigen(cat,ciudadOrigen)
+    return aeropuerto  
