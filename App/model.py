@@ -394,4 +394,4 @@ def distancia_en_c(lon1, lat1, lon2, lat2):
 def ordena(x, y):
     if (x > y):
         return 0
-    return -1
+    return  -1

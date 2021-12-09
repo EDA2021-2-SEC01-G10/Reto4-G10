@@ -270,12 +270,12 @@ while True:
          destino=(destinoI.lower()).strip()
          listOrigen=listarOrigen(cat,origen)
          printMenuOrigen(listOrigen)
-         print("")
+         print(" ")
          ciudadOrigenInput=int(input("Ingrese el digito de la ciudad de origen correspondiente :"))
          ciudadOrigen=list(lt.iterator(listOrigen))[ciudadOrigenInput-1]
          listDestino=listarDestino(cat,destino)
          printMenuDestino(listDestino)
-         print("")
+         print(" ")
          ciudadDestinoInput=int(input("Ingrese el digito de la ciudad de destino correspondiente :"))
          ciudadDestino=list(lt.iterator(listDestino))[ciudadDestinoInput-1]
          aeropuertoOrigen=controller.buscarAeropuertoOrigen(cat,ciudadOrigen)
