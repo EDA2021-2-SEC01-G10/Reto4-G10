@@ -20,6 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from math import tan
 import config as cf
 import sys
 import controller
@@ -286,7 +287,7 @@ while True:
 
     elif int(inputs[0]) == 6:
         printreq4(cat)
-        pass
+        
 
     elif int(inputs[0]) == 7:
         aeropuerto = input("Código IATA del aeropuerto fuera de funcionamiento:  ")
@@ -294,8 +295,7 @@ while True:
 
     elif int(inputs[0]) == 8:
         print("Req 6 (BONO)")
-        pass
-
+       
 
     else:
         sys.exit(0)
