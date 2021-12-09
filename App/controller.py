@@ -98,3 +98,9 @@ def buscarAeropuertoDestino(cat,ciudadDestino):
 def distanciaVuelo(cat,origen,destino):
     dis=model.distanciaVuelo(cat,origen,destino)
     return dis    
+
+def efecto_ac(cat, aeropuerto):
+    return model.efecto_ac(cat, aeropuerto)
+
+def millas_viajero(cat, origen):
+    return model.millas_viajero(cat, origen)    
