@@ -159,7 +159,7 @@ def listarDestino(cat,destino):
     return listDestino
 
 def printMenuDestino(listDestino):
-    print("")
+    print(" ")
     print("Las siguientes son las ciudades en nuestros datos que coinciden con la que usted desea seleccionar como destino:")
     ciudades=list(lt.iterator(listDestino))
     for i in range(0,len(ciudades)):
